@@ -17,15 +17,27 @@ Given an apache logfile, find the puzzle urls and download the images.
 Here's what a puzzle url looks like:
 10.254.254.28 - - [06/Aug/2007:00:13:48 -0700] "GET /~foo/puzzle-bar-aaab.jpg HTTP/1.0" 302 528 "-" "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.6) Gecko/20070725 Firefox/2.0.0.6"
 """
-
+def word_key(s):
+  return s.split('-')[-1]
 
 def read_urls(filename):
   """Returns a list of the puzzle urls from the given log file,
   extracting the hostname from the filename itself.
   Screens out duplicate urls and returns the urls sorted into
   increasing order."""
-  # +++your code here+++
-  
+  domain = re.search(r'_(.+)',filename).group(1)
+  match = set()
+  file = open(filename)
+
+  for line in file:
+    matched = re.search(r'GET (.+) HTTP',line)
+    if matched:
+      if "puzzle" in matched.group(1):
+        match.add("http://" +domain+matched.group(1))
+        print "http://" +domain+matched.group(1)
+
+  file.close()
+  return sorted(match)
 
 def download_images(img_urls, dest_dir):
   """Given the urls already in the correct order, downloads
@@ -35,8 +47,23 @@ def download_images(img_urls, dest_dir):
   with an img tag to show each local image file.
   Creates the directory if necessary.
   """
-  # +++your code here+++
-  
+  if not os.path.isdir(dest_dir):
+    os.makedirs(dest_dir)
+
+  html_parts = ["<html><body>"]
+
+  for i, url in enumerate(img_urls):
+    urlfile = urllib.urlopen(url)
+    img = urlfile.read()
+    f = open("./%s/img%d" % (dest_dir, i), 'wb')
+    f.write(img)
+    f.close()
+
+    html_parts.append('<img src="img%d">' % i)
+
+    f = open('./' + dest_dir + '/index.html', 'w')
+    f.write(''.join(html_parts))
+    f.close()
 
 def main():
   args = sys.argv[1:]
