@@ -11,14 +11,45 @@ import re
 import os
 import shutil
 import commands
+import zipfile
 
 """Copy Special exercise
 """
 
-# +++your code here+++
-# Write functions and modify main() to call them
+def copy_to(source, target):
+    if not os.path.isdir(target):
+        os.makedirs(target)
+    paths = special_paths(source)
+    for p in paths:
+        shutil.copy(p, target + '/' + p)
 
+def zip_to(source, target):
+    copy_to(source,target)
+    zipf = zipfile.ZipFile('copyspecial.zip', 'w', zipfile.ZIP_DEFLATED)
+    zipdir(target, zipf)
+    zipf.close()
+    # cmd='py'
+    # (status, output) = commands.getstatusoutput(cmd)
+    # if status:
+    #     sys.stderr.write(output)
+    #     sys.exit(1)
 
+def zipdir(path, ziph):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file))
+
+def special_paths(dir):
+  results = []
+  filenames = os.listdir(dir)
+  for filename in filenames:
+    if re.match(r'.+\_\_\w+\_\_.+', filename):
+      results.append(filename)
+  return  results
+
+def print_results(results):
+    for result in results:
+        print(os.path.abspath(result))
 
 def main():
   # This basic command line argument parsing code is provided.
@@ -48,8 +79,11 @@ def main():
     print "error: must specify one or more dirs"
     sys.exit(1)
 
-  # +++your code here+++
-  # Call your functions
-  
+  if todir:
+    copy_to(args[0],todir)
+  elif tozip:
+    zip_to(args[0],tozip)
+  print_results(special_paths(args[0]))
+
 if __name__ == "__main__":
   main()
