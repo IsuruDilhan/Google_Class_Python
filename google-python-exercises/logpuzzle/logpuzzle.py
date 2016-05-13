@@ -50,7 +50,7 @@ def download_images(img_urls, dest_dir):
   if not os.path.isdir(dest_dir):
     os.makedirs(dest_dir)
 
-  html_parts = ["<html><body>"]
+  html = ["<html><body>"]
 
   for i, url in enumerate(img_urls):
     urlfile = urllib.urlopen(url)
@@ -59,10 +59,10 @@ def download_images(img_urls, dest_dir):
     f.write(img)
     f.close()
 
-    html_parts.append('<img src="img%d">' % i)
+    html.append('<img src="img%d">' % i)
 
     f = open('./' + dest_dir + '/index.html', 'w')
-    f.write(''.join(html_parts))
+    f.write(''.join(html))
     f.close()
 
 def main():

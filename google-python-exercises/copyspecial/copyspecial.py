@@ -27,6 +27,7 @@ def zip_to(source, target):
     copy_to(source,target)
     zipf = zipfile.ZipFile('copyspecial.zip', 'w', zipfile.ZIP_DEFLATED)
     zipdir(target, zipf)
+    #shutil.rmtree(target)
     zipf.close()
     # cmd='py'
     # (status, output) = commands.getstatusoutput(cmd)
